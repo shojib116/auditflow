@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/shojib116/auditflow-api/internal/web/middlewares"
 )
 
 func handlerHealth(w http.ResponseWriter, r *http.Request) {
@@ -15,12 +17,15 @@ func handlerHealth(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	const PORT = "8080"
+	const ORIGIN = "http://localhost:5173"
+
+	mngr := middlewares.NewManager(middlewares.Logger, middlewares.CORS(ORIGIN))
 	mux := http.NewServeMux()
 
 	mux.Handle("GET /healthz", http.HandlerFunc(handlerHealth))
 
 	fmt.Printf("Server running on http://localhost:%v", PORT)
-	if err := http.ListenAndServe(":"+PORT, mux); err != nil {
+	if err := http.ListenAndServe(":"+PORT, mngr.Wrap(mux)); err != nil {
 		log.Fatal("Error occured:", err)
 	}
 
