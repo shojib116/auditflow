@@ -33,6 +33,15 @@ func (r *userRepository) Create(ctx context.Context, user *iam.User) (*iam.User,
 	return toDomainUser(dbUser)
 }
 
+func (r *userRepository) GetUserByEmail(ctx context.Context, email iam.Email) (*iam.User, error) {
+	user, err := r.queries.GetUserByEmail(ctx, string(email))
+	if err != nil {
+		return nil, err
+	}
+
+	return toDomainUser(user)
+}
+
 func toDomainUser(dbUser database.User) (*iam.User, error) {
 	email, err := iam.NewEmail(dbUser.Email)
 	if err != nil {
