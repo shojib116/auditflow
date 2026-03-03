@@ -2,7 +2,7 @@
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(256) UNIQUE NOT NULL,
-    full_name VARCHAR(256) NOT NULL,
+    full_name VARCHAR(256) NOT NULL DEFAULT 'unset',
     password_hash TEXT NOT NULL,
     is_verified BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
