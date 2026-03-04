@@ -4,9 +4,10 @@ import (
 	"crypto/rand"
 	"crypto/subtle"
 	"encoding/base64"
+	"errors"
 	"fmt"
-	"regexp"
 	"strings"
+	"unicode"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -14,8 +15,8 @@ import (
 type PasswordHash string
 
 func NewPasswordHash(plain string) (PasswordHash, error) {
-	if !isPasswordValid(plain) {
-		return "", ErrInvalidPassword
+	if err := isPasswordValid(plain); err != nil {
+		return "", err
 	}
 
 	hash, err := HashPassword(plain)
@@ -26,12 +27,40 @@ func NewPasswordHash(plain string) (PasswordHash, error) {
 	return PasswordHash(hash), nil
 }
 
-var passwordRegex = regexp.MustCompile(
-	`^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^&\*\(\)_\+\-=\[\]\{\};':"\\|,.<>\/\?]).{8,}$`,
-)
+func isPasswordValid(p string) error {
+	if len(p) < 8 {
+		return errors.New("password must be at least 8 characters")
+	}
 
-func isPasswordValid(plain string) bool {
-	return passwordRegex.MatchString(plain)
+	var hasLower, hasUpper, hasDigit, hasSpecial bool
+
+	for _, c := range p {
+		switch {
+		case unicode.IsLower(c):
+			hasLower = true
+		case unicode.IsUpper(c):
+			hasUpper = true
+		case unicode.IsDigit(c):
+			hasDigit = true
+		case strings.ContainsRune("!@#$%^&*()_+-=[]{};':\"\\|,.<>/?", c):
+			hasSpecial = true
+		}
+	}
+
+	if !hasLower {
+		return errors.New("password must contain a lowercase letter")
+	}
+	if !hasUpper {
+		return errors.New("password must contain an uppercase letter")
+	}
+	if !hasDigit {
+		return errors.New("password must contain a digit")
+	}
+	if !hasSpecial {
+		return errors.New("password must contain a special character")
+	}
+
+	return nil
 }
 
 type ArgonParams struct {
