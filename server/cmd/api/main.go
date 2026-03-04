@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/shojib116/auditflow-api/config"
-	"github.com/shojib116/auditflow-api/internal/web/middlewares"
+	"github.com/shojib116/auditflow-api/internal/interfaces/http/middlewares"
 )
 
 func handlerHealth(w http.ResponseWriter, r *http.Request) {
