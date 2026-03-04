@@ -1,11 +1,11 @@
-package postgres
+package iam
 
 import (
 	"context"
 	"database/sql"
 
 	"github.com/shojib116/auditflow-api/internal/database"
-	"github.com/shojib116/auditflow-api/internal/domain/iam"
+	iamDomain "github.com/shojib116/auditflow-api/internal/domain/iam"
 )
 
 type userRepository struct {
@@ -13,17 +13,17 @@ type userRepository struct {
 	queries *database.Queries
 }
 
-func NewUserRepository(db *sql.DB) iam.UserRepository {
+func NewUserRepository(db *sql.DB) iamDomain.UserRepository {
 	return &userRepository{
 		db:      db,
 		queries: database.New(db),
 	}
 }
 
-func (r *userRepository) Create(ctx context.Context, user *iam.User) (*iam.User, error) {
+func (r *userRepository) Create(ctx context.Context, user *iamDomain.User) (*iamDomain.User, error) {
 	dbUser, err := r.queries.CreateUser(ctx, database.CreateUserParams{
 		Email:        string(user.Email),
-		PasswordHash: user.PasswordHash,
+		PasswordHash: string(user.PasswordHash),
 		FullName:     user.FullName,
 	})
 	if err != nil {
@@ -33,7 +33,7 @@ func (r *userRepository) Create(ctx context.Context, user *iam.User) (*iam.User,
 	return toDomainUser(dbUser)
 }
 
-func (r *userRepository) GetUserByEmail(ctx context.Context, email iam.Email) (*iam.User, error) {
+func (r *userRepository) GetUserByEmail(ctx context.Context, email iamDomain.Email) (*iamDomain.User, error) {
 	user, err := r.queries.GetUserByEmail(ctx, string(email))
 	if err != nil {
 		return nil, err
@@ -42,16 +42,16 @@ func (r *userRepository) GetUserByEmail(ctx context.Context, email iam.Email) (*
 	return toDomainUser(user)
 }
 
-func toDomainUser(dbUser database.User) (*iam.User, error) {
-	email, err := iam.NewEmail(dbUser.Email)
+func toDomainUser(dbUser database.User) (*iamDomain.User, error) {
+	email, err := iamDomain.NewEmail(dbUser.Email)
 	if err != nil {
 		return nil, err
 	}
 
-	return &iam.User{
+	return &iamDomain.User{
 		ID:           dbUser.ID,
 		Email:        email,
-		PasswordHash: dbUser.PasswordHash,
+		PasswordHash: iamDomain.PasswordHash(dbUser.PasswordHash),
 		FullName:     dbUser.FullName,
 	}, nil
 }
