@@ -26,7 +26,7 @@ func (h *Handler) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		appError := MapError(err)
-		utils.SendError(w, appError.StatusCode, appError.Message)
+		utils.HandleAndLogError(w, r, appError.StatusCode, appError.Message)
 		return
 	}
 
@@ -37,7 +37,7 @@ func (h *Handler) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		appError := MapError(err)
-		utils.SendError(w, appError.StatusCode, appError.Message)
+		utils.HandleAndLogError(w, r, appError.StatusCode, appError.Message)
 		return
 	}
 
