@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 
 	iamDomain "github.com/shojib116/auditflow-api/internal/domain/iam"
@@ -34,7 +35,7 @@ func (s *UserService) RegisterUser(ctx context.Context, input RegisterRequestInp
 		return nil, iamDomain.ErrUserAlreadyExists
 	}
 
-	if !errors.Is(err, iamDomain.ErrUserNotFound) {
+	if !errors.Is(err, sql.ErrNoRows) {
 		return nil, err
 	}
 
