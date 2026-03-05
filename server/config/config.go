@@ -22,6 +22,7 @@ type DBConfig struct {
 type Config struct {
 	HttpPort       int
 	FrontendDomain string
+	Pepper         string
 	DB             *DBConfig
 }
 
@@ -78,6 +79,7 @@ func loadConfig() {
 	config = &Config{
 		HttpPort:       port,
 		FrontendDomain: envOrExit("FRONTEND_DOMAIN"),
+		Pepper:         envOrExit("PASS_PEPPER"),
 		DB:             dbConfig,
 	}
 }

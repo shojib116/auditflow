@@ -32,7 +32,7 @@ func main() {
 	}
 
 	iamRepo := iamRepository.NewUserRepository(dbConn)
-	iamSvc := iamService.NewUserService(iamRepo)
+	iamSvc := iamService.NewUserService(iamRepo, cfg)
 	iamHndlr := iamHandler.NewHandler(&iamSvc)
 
 	mngr := middlewares.NewManager(middlewares.Logger, middlewares.CORS(cfg.FrontendDomain))

@@ -5,16 +5,19 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/shojib116/auditflow-api/config"
 	iamDomain "github.com/shojib116/auditflow-api/internal/domain/iam"
 )
 
 type UserService struct {
 	repo iamDomain.UserRepository
+	cfg  *config.Config
 }
 
-func NewUserService(r iamDomain.UserRepository) UserService {
+func NewUserService(r iamDomain.UserRepository, c *config.Config) UserService {
 	return UserService{
 		repo: r,
+		cfg:  c,
 	}
 }
 
@@ -39,7 +42,8 @@ func (s *UserService) RegisterUser(ctx context.Context, input RegisterRequestInp
 		return nil, err
 	}
 
-	hash, err := iamDomain.NewPasswordHash(input.Password)
+	pepper := s.cfg.Pepper
+	hash, err := iamDomain.NewPasswordHash(input.Password + pepper)
 	if err != nil {
 		return nil, err
 	}
