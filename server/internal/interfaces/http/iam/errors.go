@@ -2,6 +2,7 @@ package iam
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	iamDomain "github.com/shojib116/auditflow-api/internal/domain/iam"
@@ -26,19 +27,19 @@ func MapError(err error) *AppError {
 	case errors.Is(err, iamDomain.ErrUserAlreadyExists):
 		return &AppError{
 			Err:        err,
-			Message:    "User already exists",
+			Message:    fmt.Sprintf("User already exists: %s", err.Error()),
 			StatusCode: http.StatusConflict,
 		}
 	case errors.Is(err, iamDomain.ErrInvalidPassword):
 		return &AppError{
 			Err:        err,
-			Message:    "password is invalid",
+			Message:    fmt.Sprintf("password is invalid: %s", err.Error()),
 			StatusCode: http.StatusBadRequest,
 		}
 	case errors.Is(err, iamDomain.ErrUserNotFound):
 		return &AppError{
 			Err:        err,
-			Message:    "user not found",
+			Message:    fmt.Sprintf("user not found: %s", err.Error()),
 			StatusCode: http.StatusNotFound,
 		}
 	default:
